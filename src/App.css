@@ -1,3 +1,109 @@
+
+:root {
+  --ticker-height: 20px;
+  --toolbar-height: 80px;
+  --content-area-height: calc(100vh - var(--ticker-height) - var(--toolbar-height))
+}
+
+/* ========================================================================= */
+.main-container {
+  height: 100vh;
+}
+/* =========================================================================
+                        Tools Ticker
+========================================================================= */
+.tools-ticker {
+  position: relative;
+  display: flex;
+  height: var(--ticker-height);
+  width: 100%;
+  overflow: hidden;
+  z-index: 5;background-color: #ff7a96;
+  box-shadow: 0 0px 10px -4px black;
+}
+.tools-ticker-prompt {
+  flex-shrink: 0; 
+  white-space: nowrap;
+}
+.tools-ticker-item {
+  margin-left: 32px;
+  display: inline-block;
+  flex-grow: 1;
+  white-space: nowrap;
+  /* animation: ticker 30s linear infinite;
+  animation: delay 6s linear infinite; */
+}
+@keyframes ticker {
+  0% {
+    transform: translateX(0%); 
+  }
+  50% {
+    transform: translateX(-50%);
+  }
+}
+/* =========================================================================
+                        Toolbar Area
+========================================================================= */
+.toolbar-area {
+  display: flex; /* Allow horizontal layout */
+  height: var(--toolbar-height);
+  width: 100%;
+  z-index: 0;
+  background-color: #ffe27a;
+}
+
+.brand-area {
+  height: var(--toolbar-height);
+  margin-left: auto; /* Push to the right side */
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+}
+
+.brand-label {
+  margin-right: 16px;
+}
+
+.brand-button {
+  margin-right: 32px;
+  width: 48px; /* Set desired width */
+  height: 48px; /* Set desired height */
+  border: #FFFFFF10;
+  background: white;
+  border-radius: 100%;
+  cursor: pointer;       /* Indicate clickability */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); /* Softer shadow on hover */
+}
+.brand-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); /* Softer shadow on hover */
+}
+.brand-button:active {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .75); /* More distinct shadow on press */
+  transform: scale(0.75); /* Slightly shrinks the icon on click */
+}
+
+/* =========================================================================
+                        Content Area
+========================================================================= */
+.content-area {
+  position: relative;
+  height: var(--content-area-height);
+  /* width: 100%; */
+  /* display: flex; */
+  background-color: lightsalmon;
+  box-shadow: 0 0px 20px -4px black;
+  z-index: 5;
+}
+
+
+
+
+
+
+
+/* =========================================================================
+                          Application
+========================================================================= */
 .App {
   text-align: center;
 }
@@ -10,29 +116,5 @@
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }

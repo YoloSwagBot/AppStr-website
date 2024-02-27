@@ -1,25 +1,91 @@
-import logo from './logo.svg';
+ 
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
-function App() {
+import logo from './images/ic_appstr_brand_logo.svg'; 
+ 
+// 000080 : dark_blue
+// 2a7fff : light_blue
+// 5fbcd3 : cyanish
+// 5fd3bc : tealish
+// ffdd55 : yellow
+// ff9955 : orange
+// ff80b2 : pink
+// fc3c3c : red
+
+function Worksite() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="main-container">
+        <ToolsTicker/>
+        <ToolbarArea/>
+        <ContentArea/>
+      </div>
+  );
+}
+
+function ToolsTicker() {
+  const toolsUsedText = "React, Google Cloud Platform(GCP), Helm, Kubernetes, Docker, Nginx, GraphQL(coming soon), PostgreSQL(coming soon), Kotlin/Compose/etc on Android, and more..."
+  
+  const [tickerWidth, setTickerWidth] = useState(null);
+  const tickerRef = useRef(null);
+
+  useEffect(() => {
+    const tickerElement = tickerRef.current;
+    setTickerWidth(tickerElement.clientWidth);
+  }, [toolsUsedText]);
+
+  return (
+    <div className="tools-ticker" ref={tickerRef}>
+      <span className="tools-ticker-prompt">Tools used:</span>
+      <span className="tools-ticker-item">{toolsUsedText}</span>
     </div>
   );
 }
 
-export default App;
+function ToolbarArea() {
+  return (
+    <div className="toolbar-area">
+
+      <BrandArea/>
+    </div>
+  );
+}
+
+function ToolbarIndicator() {
+  return (
+    <div>
+
+    </div>
+  );
+}
+
+function ToolbarTabLabel() {
+  return (
+    <div>
+
+    </div>
+  );
+}
+
+function BrandArea() {
+  return (
+    <div className="brand-area">
+      <span class="brand-label">AppStr</span>
+      <button class="brand-button">
+        <img className="brand-icon" src={logo}  alt="Logo" width="32" height="32"  viewBox="0 0 100 100"/>
+
+      </button>
+    </div>
+  );
+}
+
+function ContentArea() {
+  return (
+    <div className="content-area">
+
+    </div>
+  );
+}
+
+ 
+export default Worksite;

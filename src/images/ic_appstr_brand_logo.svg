@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="3584" height="3584" version="1.1" viewBox="0 0 948.27 948.27" xmlns="http://www.w3.org/2000/svg" xmlnsSvg="http://www.w3.org/2000/svg">
+   <rect x="432.82" y="295.89" width="141.04" height="152.98" ry="10.959" fill="#fc3c3c"/>
+   <rect transform="matrix(-.99999 .0037246 -.0003195 -1 0 0)" x="-447.26" y="-312.12" width="266.43" height="149.01" fill="#fd5" stroke-width=".19366"/>
+   <rect transform="matrix(.90641 -.42239 .90641 .42239 0 0)" x="34.374" y="593.78" width="177.01" height="176.03" fill="#ff80b2" stroke-width=".62272"/>
+   <path d="m406.88 102.79-258.37 694.2h160.05l238.89-641.88z" fill="#2a7fff" stroke-width=".36023"/>
+   <rect transform="matrix(-.99999 .0041953 -.00028365 -1 0 0)" x="-729.82" y="-313.59" width="236.54" height="149.01" fill="#f95" stroke-width=".18248"/>
+   <rect transform="matrix(.81282 .58251 -.58313 .81238 0 0)" x="241.67" y="26.671" width="649.88" height="150" fill="#5fd3bc" stroke-width=".30347"/>
+   <circle cx="221.32" cy="810.39" r="100" fill="#000080"/>
+   <rect transform="matrix(.35802 .93372 -.93405 .35713 0 0)" x="241.27" y="-493.13" width="599.89" height="150" fill="#5fbcd3" stroke-width=".29156"/>
+</svg>
