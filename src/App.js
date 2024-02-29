@@ -64,19 +64,37 @@ function Worksite() {
     contentAreaMinSideMargin = 64;
     contentAreaMaxSideMargin = 128;
   }
-
   const contentAreaHeight = screenHeight - toolbarHeight - tickerHeight;
+
+  var contentAreaMaxTransY = contentAreaHeight - contentAreaMaxCorners;
+  const [translationY, setTranslationY] = useState(0);
+  var contentAreaTransY = translationY
+  const onWheel = (event) => {
+    contentAreaTransY = contentAreaTransY + event.deltaY;
+    contentAreaTransY = Math.min(Math.max(contentAreaTransY, 0), contentAreaMaxTransY);
+    setTranslationY(contentAreaTransY);
+  };
+  useEffect(() => {
+    document.addEventListener('wheel', onWheel);
+    return () => document.removeEventListener('wheel', onWheel);
+  }, []);
 
   return (
       <div className="main-container">
         <SuperBackground/>
-        <ToolsTicker 
+        <ToolsTicker
           tickerHeight={tickerHeight}
+          contentAreaTransY={contentAreaTransY}
+          contentAreaMaxTransY={contentAreaMaxTransY}
           contentAreaMinSideMargin={contentAreaMinSideMargin} />
         <BrandArea/>
         <ContentArea
           screenWidth={screenWidth}
           screenHeight={screenHeight}
+
+          contentAreaTransY={contentAreaTransY}
+          contentAreaMaxTransY={contentAreaMaxTransY}
+
           contentAreaHeight={contentAreaHeight}
           contentAreaMinCorners={contentAreaMinCorners} 
           contentAreaMaxCorners={contentAreaMaxCorners} 
@@ -94,16 +112,27 @@ function SuperBackground() {
   );
 }
 
-function ToolsTicker({contentAreaMinSideMargin}) {
+function ToolsTicker(
+  { tickerHeight,
+    contentAreaTransY,
+    contentAreaMaxTransY,
+    contentAreaMinSideMargin }
+) {
+  // max ticker transY is (-1 * tickerHeight)
+  var toolsTickerTransY = -1 * ((contentAreaTransY * (tickerHeight - 0)) / ((contentAreaMaxTransY/2) - 0));
+  console.log("toolsTickerTransY: " + toolsTickerTransY);
+
   const toolsUsedText = "React, Google Cloud Platform(GCP), Helm, Kubernetes, Docker, Nginx, GraphQL(coming soon), PostgreSQL(coming soon), Kotlin/Compose/etc on Android, and more...";
-  
   return (
     <div className="tools-ticker"
       style={{
+        transform: `translateY(${toolsTickerTransY}px)`,
         left: `${contentAreaMinSideMargin}px`,
         right: `${contentAreaMinSideMargin}px`
       }}>
-      <span className="tools-ticker-text">{toolsUsedText}</span>
+        <div className="tools-ticker-text">
+            {toolsUsedText}
+        </div>
     </div>
   );
 }
@@ -139,32 +168,23 @@ function BrandArea() {
 function ContentArea(
   { screenWidth, 
     screenHeight, 
+    
+    contentAreaTransY,
+    contentAreaMaxTransY,
+
     contentAreaHeight, 
     contentAreaMinCorners, 
     contentAreaMaxCorners,
     contentAreaMinSideMargin,
-    contentAreaMaxSideMargin}
+    contentAreaMaxSideMargin }
 ) {
-  var maxTransY = contentAreaHeight - contentAreaMaxCorners;
 
-  const [translationY, setTranslationY] = useState(0);
-  var transYContentArea = translationY
-  const onWheel = (event) => {
-    transYContentArea = transYContentArea + event.deltaY;
-    transYContentArea = Math.min(Math.max(transYContentArea, 0), maxTransY);
-    setTranslationY(transYContentArea);
-  };
-  useEffect(() => {
-    document.addEventListener('wheel', onWheel);
-    return () => document.removeEventListener('wheel', onWheel);
-  }, []);
-
-  var currentCornerSize = ((transYContentArea * (contentAreaMaxCorners - contentAreaMinCorners)) / (maxTransY - 0)) + contentAreaMinCorners;
-  var currentSizeMargin = ((transYContentArea * (contentAreaMaxSideMargin - contentAreaMinSideMargin)) / (maxTransY - 0)) + contentAreaMinSideMargin;
+  var currentCornerSize = ((contentAreaTransY * (contentAreaMaxCorners - contentAreaMinCorners)) / (contentAreaMaxTransY - 0)) + contentAreaMinCorners;
+  var currentSizeMargin = ((contentAreaTransY * (contentAreaMaxSideMargin - contentAreaMinSideMargin)) / (contentAreaMaxTransY - 0)) + contentAreaMinSideMargin;
   return (
     <div className="content-area" style={
       {
-        transform: `translateY(${translationY}px)`,
+        transform: `translateY(${contentAreaTransY}px)`,
         borderTopLeftRadius: `${currentCornerSize}px`,
         borderTopRightRadius: `${currentCornerSize}px`,
         left: `${currentSizeMargin}px`,

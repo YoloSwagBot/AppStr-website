@@ -33,11 +33,18 @@ html {
   z-index: 5;
   background-color: #d9ff7a;
   box-shadow: 0 0px 10px -4px black;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 .tools-ticker-text {
-  margin-left: 32px;
-  display: inline-block;
+  margin-left: 16px;
   white-space: nowrap;
+  text-overflow: clip;
+  overflow: scroll;
+}
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* make scrollbar transparent */
 }
 /* =========================================================================
                         Toolbar Area
