@@ -16,13 +16,72 @@ import logo from './images/ic_appstr_brand_logo.svg';
 
 
 
+
 function Worksite() {
+  const [screenWidth, setWidth] = useState(window.innerWidth);
+  const [screenHeight, setHeight] = useState(window.innerHeight);
+  console.log("initial_dimensions: " + screenWidth + ", " + screenHeight);
+  const isMobileWidth = screenWidth < 481;
+  const isSmallScreen = !isMobileWidth && screenWidth < 1025;
+  // const isLargerScreen = !isMobileWidth && !isSmallScreen;
+  useEffect(() => {
+    const handleResize = () => {
+      console.log("ON_RESIZE_EVENT: w: " + window.innerWidth + "    h: " + window.innerHeight);
+      setWidth(window.innerWidth);
+      setHeight(window.innerHeight);
+      console.log("ON_RESIZE_EVENT: screenWidth: " + screenWidth + "    screenHeight: " + screenHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+
+  var tickerHeight = 16;
+  var toolbarHeight = 64;
+  var contentAreaMinCorners = 24;
+  var contentAreaMaxCorners = 48;
+  var contentAreaMinSideMargin = 32;
+  var contentAreaMaxSideMargin = 64
+  if (isMobileWidth){
+    tickerHeight = 16;
+    toolbarHeight = 64;
+    contentAreaMinCorners = 16;
+    contentAreaMaxCorners = 32;
+    contentAreaMinSideMargin = 16;
+    contentAreaMaxSideMargin = 32
+  }else if(isSmallScreen){
+    tickerHeight = 20;
+    toolbarHeight = 80;
+    contentAreaMinCorners = 32;
+    contentAreaMaxCorners = 80;
+    contentAreaMinSideMargin = 56;
+    contentAreaMaxSideMargin = 98;
+  }else{ // isLargerScreen
+    tickerHeight = 20;
+    toolbarHeight = 80;
+    contentAreaMinCorners = 32;
+    contentAreaMaxCorners = 96;
+    contentAreaMinSideMargin = 64;
+    contentAreaMaxSideMargin = 128;
+  }
+
+  const contentAreaHeight = screenHeight - toolbarHeight - tickerHeight;
+
   return (
       <div className="main-container">
         <SuperBackground/>
-        <ToolsTicker/>
+        <ToolsTicker 
+          tickerHeight={tickerHeight}
+          contentAreaMinSideMargin={contentAreaMinSideMargin} />
         <BrandArea/>
-        <ContentArea/>
+        <ContentArea
+          screenWidth={screenWidth}
+          screenHeight={screenHeight}
+          contentAreaHeight={contentAreaHeight}
+          contentAreaMinCorners={contentAreaMinCorners} 
+          contentAreaMaxCorners={contentAreaMaxCorners} 
+          contentAreaMinSideMargin={contentAreaMinSideMargin}
+          contentAreaMaxSideMargin={contentAreaMaxSideMargin} />
       </div>
   );
 }
@@ -35,19 +94,15 @@ function SuperBackground() {
   );
 }
 
-function ToolsTicker() {
-  const toolsUsedText = "React, Google Cloud Platform(GCP), Helm, Kubernetes, Docker, Nginx, GraphQL(coming soon), PostgreSQL(coming soon), Kotlin/Compose/etc on Android, and more..."
+function ToolsTicker({contentAreaMinSideMargin}) {
+  const toolsUsedText = "React, Google Cloud Platform(GCP), Helm, Kubernetes, Docker, Nginx, GraphQL(coming soon), PostgreSQL(coming soon), Kotlin/Compose/etc on Android, and more...";
   
-  const [tickerWidth, setTickerWidth] = useState(null);
-  const tickerRef = useRef(null);
-
-  useEffect(() => {
-    const tickerElement = tickerRef.current;
-    setTickerWidth(tickerElement.clientWidth);
-  }, [toolsUsedText]);
-
   return (
-    <div className="tools-ticker" ref={tickerRef}>
+    <div className="tools-ticker"
+      style={{
+        left: `${contentAreaMinSideMargin}px`,
+        right: `${contentAreaMinSideMargin}px`
+      }}>
       <span className="tools-ticker-text">{toolsUsedText}</span>
     </div>
   );
@@ -81,31 +136,41 @@ function BrandArea() {
   );
 }
 
-function ContentArea() {
-  const maxTransY = 200
+function ContentArea(
+  { screenWidth, 
+    screenHeight, 
+    contentAreaHeight, 
+    contentAreaMinCorners, 
+    contentAreaMaxCorners,
+    contentAreaMinSideMargin,
+    contentAreaMaxSideMargin}
+) {
+  var maxTransY = contentAreaHeight - contentAreaMaxCorners;
+
   const [translationY, setTranslationY] = useState(0);
   var transYContentArea = translationY
-  
   const onWheel = (event) => {
-    transYContentArea = transYContentArea + event.deltaY
-    
-    if (transYContentArea > 0){
-      transYContentArea = Math.min(transYContentArea, maxTransY);
-    }else{
-      transYContentArea = Math.max(transYContentArea, 0);
-    }
-
+    transYContentArea = transYContentArea + event.deltaY;
+    transYContentArea = Math.min(Math.max(transYContentArea, 0), maxTransY);
     setTranslationY(transYContentArea);
   };
-
   useEffect(() => {
     document.addEventListener('wheel', onWheel);
     return () => document.removeEventListener('wheel', onWheel);
   }, []);
 
+  var currentCornerSize = ((transYContentArea * (contentAreaMaxCorners - contentAreaMinCorners)) / (maxTransY - 0)) + contentAreaMinCorners;
+  var currentSizeMargin = ((transYContentArea * (contentAreaMaxSideMargin - contentAreaMinSideMargin)) / (maxTransY - 0)) + contentAreaMinSideMargin;
   return (
-    <div className="content-area" style={{ transform: `translateY(${translationY}px)` }}>
-        {/* <p>Number of fingers: {touches.length}</p> */}
+    <div className="content-area" style={
+      {
+        transform: `translateY(${translationY}px)`,
+        borderTopLeftRadius: `${currentCornerSize}px`,
+        borderTopRightRadius: `${currentCornerSize}px`,
+        left: `${currentSizeMargin}px`,
+        right: `${currentSizeMargin}px`
+      }
+    }>
     </div>
   );
 }

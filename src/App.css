@@ -29,9 +29,7 @@ html {
 .tools-ticker {
   position: absolute;
   top: 0;
-  display: flex;
   height: var(--ticker-height);
-  width: 100%;
   z-index: 5;
   background-color: #d9ff7a;
   box-shadow: 0 0px 10px -4px black;
@@ -39,7 +37,6 @@ html {
 .tools-ticker-text {
   margin-left: 32px;
   display: inline-block;
-  flex-grow: 1;
   white-space: nowrap;
 }
 /* =========================================================================
@@ -83,10 +80,9 @@ html {
   position: absolute;
   bottom: 0px;
   height: var(--content-area-height);
-  width: 100%;
+  left: 10px;
+  right: 10px;
   background-color: lightsalmon;
   box-shadow: 0 0px 20px -4px black;
   z-index: 5;
-  border-top-left-radius: 64px;
-  border-top-right-radius: 64px; 
 }
