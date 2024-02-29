@@ -1,69 +1,63 @@
-
 :root {
   --ticker-height: 20px;
   --toolbar-height: 80px;
-  --content-area-height: calc(100vh - var(--ticker-height) - var(--toolbar-height))
-}
+  --content-area-height: calc(100vh - var(--ticker-height) - var(--toolbar-height));
+  
+  --color-ticker-bg: #d9ff7a;
+  --color-super-bg: #faff7a;
+  --color-content-bg: lightsalmon;
 
+}
 /* ========================================================================= */
+html {
+  height: 100%;
+  overflow: hidden;
+}
 .main-container {
   height: 100vh;
+  width: 100vw;
+}
+.super-background {
+  background-color: #faff7a;
+  height: 100vh;
+  width: 100vw;
+  z-index: 0;
 }
 /* =========================================================================
-                        Tools Ticker
+                        Ticker
 ========================================================================= */
 .tools-ticker {
-  position: relative;
+  position: absolute;
+  top: 0;
   display: flex;
   height: var(--ticker-height);
   width: 100%;
-  overflow: hidden;
-  z-index: 5;background-color: #ff7a96;
+  z-index: 5;
+  background-color: #d9ff7a;
   box-shadow: 0 0px 10px -4px black;
 }
-.tools-ticker-prompt {
-  flex-shrink: 0; 
-  white-space: nowrap;
-}
-.tools-ticker-item {
+.tools-ticker-text {
   margin-left: 32px;
   display: inline-block;
   flex-grow: 1;
   white-space: nowrap;
-  /* animation: ticker 30s linear infinite;
-  animation: delay 6s linear infinite; */
-}
-@keyframes ticker {
-  0% {
-    transform: translateX(0%); 
-  }
-  50% {
-    transform: translateX(-50%);
-  }
 }
 /* =========================================================================
                         Toolbar Area
 ========================================================================= */
-.toolbar-area {
-  display: flex; /* Allow horizontal layout */
-  height: var(--toolbar-height);
-  width: 100%;
-  z-index: 0;
-  background-color: #ffe27a;
-}
-
 .brand-area {
+  position: absolute;
+  top: var(--ticker-height);
+  right: 0px;
   height: var(--toolbar-height);
   margin-left: auto; /* Push to the right side */
   display: flex;
   align-items: center;
   background-color: transparent;
 }
-
 .brand-label {
   margin-right: 16px;
 }
-
 .brand-button {
   margin-right: 32px;
   width: 48px; /* Set desired width */
@@ -72,10 +66,10 @@
   background: white;
   border-radius: 100%;
   cursor: pointer;       /* Indicate clickability */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); /* Softer shadow on hover */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); 
 }
 .brand-button:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); /* Softer shadow on hover */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); 
 }
 .brand-button:active {
   box-shadow: 0 4px 10px rgba(0, 0, 0, .75); /* More distinct shadow on press */
@@ -86,35 +80,13 @@
                         Content Area
 ========================================================================= */
 .content-area {
-  position: relative;
+  position: absolute;
+  bottom: 0px;
   height: var(--content-area-height);
-  /* width: 100%; */
-  /* display: flex; */
+  width: 100%;
   background-color: lightsalmon;
   box-shadow: 0 0px 20px -4px black;
   z-index: 5;
-}
-
-
-
-
-
-
-
-/* =========================================================================
-                          Application
-========================================================================= */
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  border-top-left-radius: 64px;
+  border-top-right-radius: 64px; 
 }

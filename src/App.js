@@ -1,9 +1,10 @@
- 
-import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
+
+import React, { useState, useEffect, useRef } from 'react';
 
 import logo from './images/ic_appstr_brand_logo.svg'; 
  
+
 // 000080 : dark_blue
 // 2a7fff : light_blue
 // 5fbcd3 : cyanish
@@ -13,13 +14,24 @@ import logo from './images/ic_appstr_brand_logo.svg';
 // ff80b2 : pink
 // fc3c3c : red
 
+
+
 function Worksite() {
   return (
       <div className="main-container">
+        <SuperBackground/>
         <ToolsTicker/>
-        <ToolbarArea/>
+        <BrandArea/>
         <ContentArea/>
       </div>
+  );
+}
+
+function SuperBackground() {
+  return (
+    <div className="super-background">
+      
+    </div>
   );
 }
 
@@ -36,25 +48,7 @@ function ToolsTicker() {
 
   return (
     <div className="tools-ticker" ref={tickerRef}>
-      <span className="tools-ticker-prompt">Tools used:</span>
-      <span className="tools-ticker-item">{toolsUsedText}</span>
-    </div>
-  );
-}
-
-function ToolbarArea() {
-  return (
-    <div className="toolbar-area">
-
-      <BrandArea/>
-    </div>
-  );
-}
-
-function ToolbarIndicator() {
-  return (
-    <div>
-
+      <span className="tools-ticker-text">{toolsUsedText}</span>
     </div>
   );
 }
@@ -67,11 +61,19 @@ function ToolbarTabLabel() {
   );
 }
 
+function ToolbarIndicator() {
+  return (
+    <div>
+
+    </div>
+  );
+}
+
 function BrandArea() {
   return (
     <div className="brand-area">
-      <span class="brand-label">AppStr</span>
-      <button class="brand-button">
+      <span className="brand-label">AppStr</span>
+      <button className="brand-button">
         <img className="brand-icon" src={logo}  alt="Logo" width="32" height="32"  viewBox="0 0 100 100"/>
 
       </button>
@@ -80,9 +82,30 @@ function BrandArea() {
 }
 
 function ContentArea() {
-  return (
-    <div className="content-area">
+  const maxTransY = 200
+  const [translationY, setTranslationY] = useState(0);
+  var transYContentArea = translationY
+  
+  const onWheel = (event) => {
+    transYContentArea = transYContentArea + event.deltaY
+    
+    if (transYContentArea > 0){
+      transYContentArea = Math.min(transYContentArea, maxTransY);
+    }else{
+      transYContentArea = Math.max(transYContentArea, 0);
+    }
 
+    setTranslationY(transYContentArea);
+  };
+
+  useEffect(() => {
+    document.addEventListener('wheel', onWheel);
+    return () => document.removeEventListener('wheel', onWheel);
+  }, []);
+
+  return (
+    <div className="content-area" style={{ transform: `translateY(${translationY}px)` }}>
+        {/* <p>Number of fingers: {touches.length}</p> */}
     </div>
   );
 }
