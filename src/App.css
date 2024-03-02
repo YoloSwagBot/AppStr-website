@@ -3,7 +3,7 @@
   --toolbar-height: 80px;
   --content-area-height: calc(100vh - var(--ticker-height) - var(--toolbar-height));
   
-  --color-ticker-bg: #d9ff7a;
+  --color-ticker-bg: hsl(77, 100%, 74%);
   --color-super-bg: #faff7a;
   --color-content-bg: lightsalmon;
 
@@ -18,7 +18,6 @@ html {
   width: 100vw;
 }
 .super-background {
-  background-color: #faff7a;
   height: 100vh;
   width: 100vw;
   z-index: 0;
@@ -93,3 +92,11 @@ html {
   box-shadow: 0 0px 20px -4px black;
   z-index: 5;
 }
+/* ========================================================================= */
+/* ============================== Other ==================================== */
+/* ========================================================================= */
+.tab-indicator{
+  box-shadow: 0 0px 20px -4px black;
+  z-index: 4;
+}
+

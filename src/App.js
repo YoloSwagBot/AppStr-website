@@ -40,6 +40,7 @@ function Worksite() {
   var tickerHeight = 16;
   var toolbarHeight = 64;
   var brandIconSize = 24
+  var tabIndicatorHeight = 8;
   var contentAreaMinCorners = 24;
   var contentAreaMaxCorners = 48;
   var contentAreaMinSideMargin = 32;
@@ -87,6 +88,7 @@ function Worksite() {
   var currentSizeMargin = ((contentAreaTransY * (contentAreaMaxSideMargin - contentAreaMinSideMargin)) / (contentAreaMaxTransY - 0)) + contentAreaMinSideMargin;
 
   const tabs = ["About", "Apps", "WhereTo", "Other"];
+  const toolbarWidth = (screenWidth-(currentSizeMargin*2)-brandIconSize)/2;
   return (
       <div className="main-container">
         <SuperBackground
@@ -99,12 +101,15 @@ function Worksite() {
           contentAreaMinSideMargin={contentAreaMinSideMargin} />
         <ToolbarArea
           top={tickerHeight}
-          left={currentSizeMargin}
+          left={currentSizeMargin+(toolbarWidth)}
           right={(currentSizeMargin)}
           tickerHeight={tickerHeight}
           toolbarHeight={toolbarHeight}
-          toolbarWidth={screenWidth-(currentSizeMargin*2)-brandIconSize}
-          labels={tabs} />
+          toolbarWidth={toolbarWidth}
+          selectedPos={1}
+          labels={tabs}
+          tabIndicatorHeight={tabIndicatorHeight}
+          opacity={1-(contentAreaTransY/contentAreaMaxTransY)} />
         <BrandArea/>
         <ContentArea
           screenWidth={screenWidth}
@@ -128,16 +133,16 @@ function SuperBackground(
   }
 ) {
   return (
-    <div className="super-background">
-    <img id="error-horse" src={error_horse}
-      style={{
-        opacity: `${contentAreaTransY / contentAreaMaxTransY}`,
-        transform: `translate(-50%, -50%)`,
-        position: `absolute`,
-        top: `50%`,
-        left: `50%`,
-        marginTop: `50px`
-      }}/>
+    <div className="super-background" style={{ backgroundColor: `#fdfecc` }}>
+      <img id="error-horse" src={error_horse}
+        style={{
+          opacity: `${contentAreaTransY / contentAreaMaxTransY}`,
+          transform: `translate(-50%, -50%)`,
+          position: `absolute`,
+          top: `50%`,
+          left: `50%`,
+          marginTop: `50px`
+        }}/>
     </div>
   );
 }
@@ -150,9 +155,9 @@ function ToolsTicker(
 ) {
   // max ticker transY is (-1 * tickerHeight)
   var toolsTickerTransY = -1 * ((contentAreaTransY * (tickerHeight - 0)) / ((contentAreaMaxTransY/2) - 0));
-  console.log("toolsTickerTransY: " + toolsTickerTransY);
+  // console.log("toolsTickerTransY: " + toolsTickerTransY);
 
-  const toolsUsedText = "React, Google Cloud Platform(GCP), Helm, Kubernetes, Docker, Nginx, GraphQL(coming soon), PostgreSQL(coming soon), Kotlin/Compose/etc on Android, and more...";
+  const toolsUsedText = "React(JSX), Google Cloud Platform(GCP), Helm, Kubernetes, Docker, Nginx, GraphQL(coming soon), PostgreSQL(coming soon), Kotlin/Compose/etc on Android, and more...";
   return (
     <div className="tools-ticker"
       style={{
@@ -175,90 +180,112 @@ function ToolbarArea(
     toolbarWidth,
 
     labels,
-    currentSelection,
+    selectedPos,
 
     left,
-    right
+    right,
+
+    tabIndicatorHeight,
+
+    opacity
   }
 ){
-  console.log("toolbarWidth:     " + toolbarWidth);
-  console.log("labels.length:    " + labels.length);
-  var divSize = toolbarWidth/labels.length;
-  const elementsPos = [
-    (0*divSize)+(divSize/2),
-    (1*divSize)+(divSize/2),
-    (2*divSize)+(divSize/2),
-    (3*divSize)+(divSize/2)
-  ];
-  console.log("divSize: " + divSize + "    elementsPos: " + elementsPos);
-  const elements = [
-    <div style={{
-      position: `absolute`,
-      transform: `translate(-50%, -50%)`,
-      top: `${(toolbarHeight/2)}px`,
-      left: `${elementsPos[0]}px`
-    }}>
-      {labels[0]}
-    </div>,
-    <div style={{
-      position: `absolute`,
-      transform: `translate(-50%, -50%)`,
-      top: `${(toolbarHeight/2)}px`,
-      left: `${elementsPos[1]}px`
-    }}>
-      {labels[1]}
-    </div>,
-    <div style={{
-      position: `absolute`,
-      transform: `translate(-50%, -50%)`,
-      top: `${(toolbarHeight/2)}px`,
-      left: `${elementsPos[2]}px`
-    }}>
-      {labels[2]}
-    </div>,
-    <div style={{
-      position: `absolute`,
-      transform: `translate(-50%, -50%)`,
-      top: `${(toolbarHeight/2)}px`,
-      left: `${elementsPos[3]}px`
-    }}>
-      {labels[3]}
-    </div>
-  ];
+  const numTabs = labels.length;
+  const tabWidth = toolbarWidth/numTabs;
+  const tabHeight = toolbarHeight-16;
+  const tabs = labels.map((label, pos) => (
+    <ToolbarTab 
+      tabHeight={tabHeight}
+      tabWidth={tabWidth}
+      top={(toolbarHeight/2)}
+      left={(pos*tabWidth)+(tabWidth/2)}
+      label={label} />
+  ));
   return(
     <div className="toolbar-area" style={{
       position: `absolute`,
       top: `${top}px`,
       left: `${left}px`,
       height: `${toolbarHeight}px`,
-      width: `${toolbarWidth}px`
+      width: `${toolbarWidth}px`,
+      transform: `translate(-50%, 0%)`,
+      opacity: `${opacity}`
     }}>
-      {elements}
+      {tabs}
+      <ToolbarIndicator
+        top={toolbarHeight-16}
+        toolbarWidth={toolbarWidth}
+        indicatorWidth={tabWidth}
+        indicatorHeight={tabIndicatorHeight}
+        labels={labels}
+        selectedPos={selectedPos} />
     </div>
   )
 }
 
-function ToolbarTabLabel(
+function ToolbarTab(
   {
+    tabHeight,
+    tabWidth,
+    top,
+    left,
+
     label
   }
-) {
-  // console.log("ToolbarTabLabel:    " + label);
-  return (
-    <div className="toolbar-tab-label">
-      {label}
+){
+const tabFontSize = `24px`;
+const tabFontColor = `#792bef`; // #7e7aff
+  return(
+    <div className="toolbar-tab" style={{
+      position: `absolute`,
+      width: `${tabWidth}px`,
+      height: `${tabHeight}px`,
+      transform: `translate(-50%, -50%)`,
+      top: `${top}px`,
+      left: `${left}px`,
+      fontSize: tabFontSize,
+      fontWeight: `bold`,
+      color: tabFontColor
+    }} >
+      <span style={{
+        position: `absolute`,
+        top: `${tabHeight/2}px`,
+        left: `${tabWidth/2}px`,
+        transform: `translate(-50%, -50%)`
+      }}>
+        {label}
+      </span>
     </div>
-  );
+  )
 }
 
 function ToolbarIndicator(
   {
+    top,
+    toolbarWidth,
+
+    indicatorWidth,
+    indicatorHeight,
+
+    labels,
+    selectedPos,
+
     color
   }
-) {
-  return (
-    <div>
-
+){
+  const left = (selectedPos*(indicatorWidth));
+  return(
+    <div className="tab-indicator" style={{
+      position: `absolute`,
+      height: `${indicatorHeight}px`,
+      width: `${indicatorWidth}px`,
+      top: `${top}px`,
+      left: `${left}px`,
+      backgroundColor: `cyan`,
+      boxShadow: `${0} ${0}px ${20}px ${-4}px #000000`,
+      zIndex: `4`
+    }}>
+      
     </div>
   );
 }
@@ -310,3 +337,60 @@ function ContentArea(
 
  
 export default Worksite;
+
+
+// const elementsPos = [
+//   (0*divSize)+(divSize/2),
+//   (1*divSize)+(divSize/2),
+//   (2*divSize)+(divSize/2),
+//   (3*divSize)+(divSize/2)
+// ];
+// // console.log("divSize: " + divSize + "    elementsPos: " + elementsPos);
+// const tabFontSize = `24px`;
+// const tabFontColor = `#792bef`; // #7e7aff
+// const elements = [
+//   <div style={{
+//     position: `absolute`,
+//     transform: `translate(-50%, -50%)`,
+//     top: `${(toolbarHeight/2)}px`,
+//     left: `${elementsPos[0]}px`,
+//     fontSize: tabFontSize,
+//     fontWeight: `bold`,
+//     color: tabFontColor
+//   }}>
+//     {labels[0]}
+//   </div>,
+//   <div style={{
+//     position: `absolute`,
+//     transform: `translate(-50%, -50%)`,
+//     top: `${(toolbarHeight/2)}px`,
+//     left: `${elementsPos[1]}px`,
+//     fontSize: tabFontSize,
+//     fontWeight: `bold`,
+//     color: tabFontColor
+//   }}>
+//     {labels[1]}
+//   </div>,
+//   <div style={{
+//     position: `absolute`,
+//     transform: `translate(-50%, -50%)`,
+//     top: `${(toolbarHeight/2)}px`,
+//     left: `${elementsPos[2]}px`,
+//     fontSize: tabFontSize,
+//     fontWeight: `bold`,
+//     color: tabFontColor
+//   }}>
+//     {labels[2]}
+//   </div>,
+//   <div style={{
+//     position: `absolute`,
+//     transform: `translate(-50%, -50%)`,
+//     top: `${(toolbarHeight/2)}px`,
+//     left: `${elementsPos[3]}px`,
+//     fontSize: tabFontSize,
+//     fontWeight: `bold`,
+//     color: tabFontColor
+//   }}>
+//     {labels[3]}
+//   </div>
+// ];
