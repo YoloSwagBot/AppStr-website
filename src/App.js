@@ -2,6 +2,8 @@ import './App.css';
 
 import React, { useState, useEffect, useRef } from 'react';
 
+import {MDCRipple} from '@material/ripple';
+
 import logo from './images/ic_appstr_brand_logo.svg'; 
 import error_horse from './images/error_horse.png';
  
@@ -21,7 +23,7 @@ import error_horse from './images/error_horse.png';
 function Worksite() {
   const [screenWidth, setWidth] = useState(window.innerWidth);
   const [screenHeight, setHeight] = useState(window.innerHeight);
-  console.log("initial_dimensions: " + screenWidth + ", " + screenHeight);
+  // console.log("initial_dimensions: " + screenWidth + ", " + screenHeight);
   const isMobileWidth = screenWidth < 481;
   const isSmallScreen = !isMobileWidth && screenWidth < 1025;
   // const isLargerScreen = !isMobileWidth && !isSmallScreen;
@@ -112,15 +114,15 @@ function Worksite() {
           opacity={1-(contentAreaTransY/contentAreaMaxTransY)} />
         <BrandArea/>
         <ContentArea
-          screenWidth={screenWidth}
-          screenHeight={screenHeight}
 
           contentAreaTransY={contentAreaTransY}
           contentAreaMaxTransY={contentAreaMaxTransY}
 
+          contentAreaWidth={screenWidth-(currentSizeMargin*2)}
           contentAreaHeight={contentAreaHeight}
           contentAreaMinCorners={contentAreaMinCorners} 
           contentAreaMaxCorners={contentAreaMaxCorners}
+          
           currentSizeMargin={currentSizeMargin} />
       </div>
   );
@@ -190,11 +192,22 @@ function ToolbarArea(
     opacity
   }
 ){
+  // if mouseDown event is in a tab -> call ripple function with that tab's parameters
+  // - there is a third lambda for onMouseUp + location is inside tab(selectedTab = pos)
+  // - then onSelectedTab change -> start animating the TabIndicator+anything_else(content)
+  // onEvent_MouseDown    // onUserInput_Down
+  // rippleInTab(params)
+  // onEvent_MouseLeave   // onUserInput_LeaveArea
+  // onEvent_MouseUp      // onUserInput_Up
+  // function onSelectedTabChanged(...)
+
   const numTabs = labels.length;
   const tabWidth = toolbarWidth/numTabs;
   const tabHeight = toolbarHeight-16;
   const tabs = labels.map((label, pos) => (
     <ToolbarTab 
+      key={pos}
+      tabPosition={pos}
       tabHeight={tabHeight}
       tabWidth={tabWidth}
       top={(toolbarHeight/2)}
@@ -225,36 +238,43 @@ function ToolbarArea(
 
 function ToolbarTab(
   {
+    tabPosition,
+
     tabHeight,
     tabWidth,
     top,
     left,
 
-    label
+    label,
   }
 ){
-const tabFontSize = `24px`;
-const tabFontColor = `#792bef`; // #7e7aff
+
+  const tabFontSize = `24px`;
+  const tabFontColor = `#792bef`; // #7e7aff
+
   return(
-    <div className="toolbar-tab" style={{
-      position: `absolute`,
-      width: `${tabWidth}px`,
-      height: `${tabHeight}px`,
-      transform: `translate(-50%, -50%)`,
-      top: `${top}px`,
-      left: `${left}px`,
-      fontSize: tabFontSize,
-      fontWeight: `bold`,
-      color: tabFontColor
-    }} >
-      <span style={{
+    <div className="toolbar-tab" 
+      style={{
         position: `absolute`,
-        top: `${tabHeight/2}px`,
-        left: `${tabWidth/2}px`,
-        transform: `translate(-50%, -50%)`
-      }}>
-        {label}
-      </span>
+        width: `${tabWidth}px`,
+        height: `${tabHeight}px`,
+        transform: `translate(-50%, -50%)`,
+        top: `${top}px`,
+        left: `${left}px`,
+        fontSize: tabFontSize,
+        fontWeight: `bold`,
+        color: tabFontColor,
+        cursor: `pointer`,
+      }} >
+        <span style={{
+          position: `absolute`,
+          top: `${tabHeight/2}px`,
+          left: `${tabWidth/2}px`,
+          transform: `translate(-50%, -50%)`,
+          userSelect: `none`
+        }}>
+          {label}
+        </span>
     </div>
   )
 }
@@ -307,90 +327,123 @@ function BrandArea(
 }
 
 function ContentArea(
-  { screenWidth, 
-    screenHeight, 
-    
+  {
     contentAreaTransY,
     contentAreaMaxTransY,
 
+    contentAreaWidth,
     contentAreaHeight, 
     contentAreaMinCorners, 
     contentAreaMaxCorners,
 
-    currentSizeMargin }
+    currentSizeMargin
+  }
 ) {
+  // --content-area-height: calc(100vh - var(--ticker-height) - var(--toolbar-height));
+  const rippleRef = useRef(null);
+  const [isRippling, setIsRippling] = useState(false);
+  const [coords, setCoords] = useState({ x: -1, y: -1 });
+  var initialRippleOffsetLeft = -1;
+  var initialRippleOffsetTop = -1;
+
+  useEffect(() => {
+    // console.log("useEffect 00 -- isRippling: " + isRippling);
+    if (coords.x != -1 && coords.y != -1){
+      // console.log("useEffect 01")
+      setIsRippling(true);
+      setTimeout(() =>  setIsRippling(false), 3000);
+    }else{
+      // console.log("useEffect 02")
+      setIsRippling(false);
+    }
+  });
+
+  const [isInputDown, setIsInputDown] = useState(false);
+  var buttonRect;
+  const handleMouseDown = (event) => {
+    setIsInputDown(true);
+    setIsRippling(true);
+    // Calculate ripple center coordinates relative to the div
+    buttonRect = rippleRef.current.getBoundingClientRect();
+    initialRippleOffsetLeft = event.target.offsetLeft;
+    initialRippleOffsetTop = event.target.offsetTop;
+    setCoords({
+      x: event.clientX - initialRippleOffsetLeft,
+      y: event.clientY - initialRippleOffsetTop,
+    })
+    
+    // draw here
+
+  };
+  const handleMouseMove = (event) => {
+    if (isInputDown && (coords.x != -1 && coords.y != -1)){
+      // onDownMoveX = event.clientX - buttonRect.left;
+      // onDownMoveY = event.clientY - buttonRect.top;
+      console.log("event.clientX: " + event.clientX + " --- event.target.offsetLeft: " + event.target.offsetLeft);
+      setCoords({ 
+      x: event.clientX - initialRippleOffsetLeft,
+      y: event.clientY - initialRippleOffsetTop,
+      })
+      // console.log("handleMouseMove:      coords.x: " + coords.x + " --- coords.y: " + coords.y + " --- "
+      //   + "event.clientX: " + event.clientX + " --- event.target.offsetLeft: " + event.target.offsetLeft);
+      // re-draw here
+    }
+  }
+  const handleMouseUp = (event) => {
+    setIsInputDown(false);
+    setIsRippling(false);
+    setCoords({ x: -1, y: -1 })
+    // console.log("mouseUp --- tab, pos: " + tabPosition);
+    // stop/remove drawing
+
+  };
+  const handleMouseLeave = (event) => {
+    if (isInputDown){
+      // console.log("mouseLeave --- tab, pos: " + tabPosition);
+    }
+    setIsInputDown(false);
+    setIsRippling(false);
+    setCoords({ x: -1, y: -1 })
+    // stop/remove drawing
+
+  };
+
 
   var currentCornerSize = ((contentAreaTransY * (contentAreaMaxCorners - contentAreaMinCorners)) / (contentAreaMaxTransY - 0)) + contentAreaMinCorners;
   return (
-    <div className="content-area" style={
-      {
-        transform: `translateY(${contentAreaTransY}px)`,
-        borderTopLeftRadius: `${currentCornerSize}px`,
-        borderTopRightRadius: `${currentCornerSize}px`,
-        left: `${currentSizeMargin}px`,
-        right: `${currentSizeMargin}px`
-      }
-    }>
+    <div
+      className="content-area"
+      ref={rippleRef}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+      style={
+        {
+          position: `absolute`,
+          height: `${contentAreaHeight}px`,
+          width: `${contentAreaWidth}px`,
+          transform: `translateY(${contentAreaTransY}px)`,
+          borderTopLeftRadius: `${currentCornerSize}px`,
+          borderTopRightRadius: `${currentCornerSize}px`,
+          left: `${currentSizeMargin}px`,
+          right: `${currentSizeMargin}px`,
+          bottom: `${0}px`,
+          backgroundColor: 'lightsalmon'
+        }
+      }>
+      {isRippling ? 
+        <span className="ripple"
+          style={{
+            position: 'absolute',
+            left: `${coords.x}px`,
+            top: `${coords.y}px`,
+            transform: `translate(-50%, -50%)`
+          }}
+        />
+      : ""}
     </div>
   );
 }
-
  
 export default Worksite;
-
-
-// const elementsPos = [
-//   (0*divSize)+(divSize/2),
-//   (1*divSize)+(divSize/2),
-//   (2*divSize)+(divSize/2),
-//   (3*divSize)+(divSize/2)
-// ];
-// // console.log("divSize: " + divSize + "    elementsPos: " + elementsPos);
-// const tabFontSize = `24px`;
-// const tabFontColor = `#792bef`; // #7e7aff
-// const elements = [
-//   <div style={{
-//     position: `absolute`,
-//     transform: `translate(-50%, -50%)`,
-//     top: `${(toolbarHeight/2)}px`,
-//     left: `${elementsPos[0]}px`,
-//     fontSize: tabFontSize,
-//     fontWeight: `bold`,
-//     color: tabFontColor
-//   }}>
-//     {labels[0]}
-//   </div>,
-//   <div style={{
-//     position: `absolute`,
-//     transform: `translate(-50%, -50%)`,
-//     top: `${(toolbarHeight/2)}px`,
-//     left: `${elementsPos[1]}px`,
-//     fontSize: tabFontSize,
-//     fontWeight: `bold`,
-//     color: tabFontColor
-//   }}>
-//     {labels[1]}
-//   </div>,
-//   <div style={{
-//     position: `absolute`,
-//     transform: `translate(-50%, -50%)`,
-//     top: `${(toolbarHeight/2)}px`,
-//     left: `${elementsPos[2]}px`,
-//     fontSize: tabFontSize,
-//     fontWeight: `bold`,
-//     color: tabFontColor
-//   }}>
-//     {labels[2]}
-//   </div>,
-//   <div style={{
-//     position: `absolute`,
-//     transform: `translate(-50%, -50%)`,
-//     top: `${(toolbarHeight/2)}px`,
-//     left: `${elementsPos[3]}px`,
-//     fontSize: tabFontSize,
-//     fontWeight: `bold`,
-//     color: tabFontColor
-//   }}>
-//     {labels[3]}
-//   </div>
-// ];
