@@ -88,7 +88,6 @@ html {
   height: var(--content-area-height);
   left: 10px;
   right: 10px;
-  background-color: lightsalmon;
   box-shadow: 0 0px 20px -4px black;
   z-index: 5;
 }

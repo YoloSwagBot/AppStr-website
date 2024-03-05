@@ -3,38 +3,32 @@ import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 
 import logo from './images/ic_appstr_brand_logo.svg'; 
+import icInfo from './images/ic_info.svg';
+import icApps from './images/ic_apps.svg';
+import icWhereTo from './images/ic_whereto.svg';
+import icOther from './images/ic_other.svg';
 import error_horse from './images/error_horse.png';
  
-
-// 000080 : dark_blue
-// 2a7fff : light_blue
-// 5fbcd3 : cyanish
-// 5fd3bc : tealish
-// ffdd55 : yellow
-// ff9955 : orange
-// ff80b2 : pink
-// fc3c3c : red
-
 
 
 
 function Worksite() {
   const [screenWidth, setWidth] = useState(window.innerWidth);
   const [screenHeight, setHeight] = useState(window.innerHeight);
-  console.log("initial_dimensions: " + screenWidth + ", " + screenHeight);
-  const isMobileWidth = screenWidth < 481;
+  // console.log("initial_dimensions: " + screenWidth + ", " + screenHeight);
+  const isMobileWidth = screenWidth < 501;
   const isSmallScreen = !isMobileWidth && screenWidth < 1025;
   // const isLargerScreen = !isMobileWidth && !isSmallScreen;
-  useEffect(() => {
-    const handleResize = () => {
-      // console.log("ON_RESIZE_EVENT: w: " + window.innerWidth + "    h: " + window.innerHeight);
-      setWidth(window.innerWidth);
-      setHeight(window.innerHeight);
-      // console.log("ON_RESIZE_EVENT: screenWidth: " + screenWidth + "    screenHeight: " + screenHeight);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     // console.log("ON_RESIZE_EVENT: w: " + window.innerWidth + "    h: " + window.innerHeight);
+  //     setWidth(window.innerWidth);
+  //     setHeight(window.innerHeight);
+  //     // console.log("ON_RESIZE_EVENT: screenWidth: " + screenWidth + "    screenHeight: " + screenHeight);
+  //   };
+  //   window.addEventListener('resize', handleResize);
+  //   return () => window.removeEventListener('resize', handleResize);
+  // }, []);
 
 
   var tickerHeight = 16;
@@ -86,9 +80,22 @@ function Worksite() {
   }, []);
 
   var currentSizeMargin = ((contentAreaTransY * (contentAreaMaxSideMargin - contentAreaMinSideMargin)) / (contentAreaMaxTransY - 0)) + contentAreaMinSideMargin;
-
+  
+  const [selectedPos, setSelectedPos] = useState(0);
   const tabs = ["About", "Apps", "WhereTo", "Other"];
   const toolbarWidth = (screenWidth-(currentSizeMargin*2)-brandIconSize)/2;
+
+// 000080 : dark_blue
+// 2a7fff : light_blue
+// 5fbcd3 : cyanish
+// 5fd3bc : tealish
+// ffdd55 : yellow
+// ff9955 : orange
+// ff80b2 : pink
+// fc3c3c : red
+
+  const tabColors = ['lightsalmon', '#2a7fff', '#5fd3bc', '#ff9955'];
+
   return (
       <div className="main-container">
         <SuperBackground
@@ -106,10 +113,12 @@ function Worksite() {
           tickerHeight={tickerHeight}
           toolbarHeight={toolbarHeight}
           toolbarWidth={toolbarWidth}
-          selectedPos={1}
           labels={tabs}
           tabIndicatorHeight={tabIndicatorHeight}
-          opacity={1-(contentAreaTransY/contentAreaMaxTransY)} />
+          opacity={1-(contentAreaTransY/contentAreaMaxTransY)}
+
+          selectedPos={selectedPos} 
+          onSelectPos={setSelectedPos} />
         <BrandArea/>
         <ContentArea
           screenWidth={screenWidth}
@@ -121,7 +130,10 @@ function Worksite() {
           contentAreaHeight={contentAreaHeight}
           contentAreaMinCorners={contentAreaMinCorners} 
           contentAreaMaxCorners={contentAreaMaxCorners}
-          currentSizeMargin={currentSizeMargin} />
+          currentSizeMargin={currentSizeMargin}
+          
+          currentTab={selectedPos}
+          tabColors={tabColors} />
       </div>
   );
 }
@@ -133,15 +145,16 @@ function SuperBackground(
   }
 ) {
   return (
-    <div className="super-background" style={{ backgroundColor: `#fdfecc` }}>
+    <div className="super-background" style={{ backgroundColor: 'whitesmoke' }}>
       <img id="error-horse" src={error_horse}
         style={{
           opacity: `${contentAreaTransY / contentAreaMaxTransY}`,
           transform: `translate(-50%, -50%)`,
           position: `absolute`,
           top: `50%`,
-          left: `50%`,
-          marginTop: `50px`
+          left: `40%`,
+          marginTop: `50px`,
+          scale: `50%`
         }}/>
     </div>
   );
@@ -180,7 +193,9 @@ function ToolbarArea(
     toolbarWidth,
 
     labels,
-    selectedPos,
+
+    selectedPos, 
+    onSelectPos,
 
     left,
     right,
@@ -193,13 +208,25 @@ function ToolbarArea(
   const numTabs = labels.length;
   const tabWidth = toolbarWidth/numTabs;
   const tabHeight = toolbarHeight-16;
+  const icons = [
+    icInfo,
+    icApps,
+    icWhereTo,
+    icOther
+  ]
   const tabs = labels.map((label, pos) => (
-    <ToolbarTab 
+    <ToolbarTab
+      key={pos}
+      pos={pos}
       tabHeight={tabHeight}
       tabWidth={tabWidth}
-      top={(toolbarHeight/2)}
+      top={48}
       left={(pos*tabWidth)+(tabWidth/2)}
-      label={label} />
+      label={label}
+      iconName={icons[pos]}
+
+      selected={selectedPos}
+      setSelectedPos={onSelectPos} />
   ));
   return(
     <div className="toolbar-area" style={{
@@ -213,40 +240,62 @@ function ToolbarArea(
     }}>
       {tabs}
       <ToolbarIndicator
+        selectedPos={selectedPos}
         top={toolbarHeight-16}
         toolbarWidth={toolbarWidth}
         indicatorWidth={tabWidth}
         indicatorHeight={tabIndicatorHeight}
-        labels={labels}
-        selectedPos={selectedPos} />
+        labels={labels} />
     </div>
   )
 }
 
 function ToolbarTab(
   {
+    pos,
+
     tabHeight,
     tabWidth,
     top,
     left,
 
-    label
+    setSelectedPos,
+
+    label,
+    iconName
   }
 ){
-const tabFontSize = `24px`;
-const tabFontColor = `#792bef`; // #7e7aff
+  const handleClick = () => {
+    // console.log("ToolbarTab_handleClick_newPos: " + pos);
+    setSelectedPos(pos);
+  }
+
+  const tabFontSize = `20px`;
+  const tabFontColor = `#000`; // #7e7aff
   return(
-    <div className="toolbar-tab" style={{
-      position: `absolute`,
-      width: `${tabWidth}px`,
-      height: `${tabHeight}px`,
-      transform: `translate(-50%, -50%)`,
-      top: `${top}px`,
-      left: `${left}px`,
-      fontSize: tabFontSize,
-      fontWeight: `bold`,
-      color: tabFontColor
+    <div className="toolbar-tab"
+      key={pos}
+      onClick={handleClick}
+      style={{
+        position: `absolute`,
+        width: `${tabWidth}px`,
+        height: `${tabHeight}px`,
+        transform: `translate(-50%, -50%)`,
+        top: `${top}px`,
+        left: `${left}px`,
+        fontSize: tabFontSize,
+        fontWeight: `bold`,
+        color: tabFontColor,
+        cursor: 'pointer'
     }} >
+      <img className="tab-icon" src={iconName} width="24" height="24"  viewBox="0 0 100 100"
+        style={{
+          position: `absolute`,
+          top: `${8}px`,
+          left: `${tabWidth/2}px`,
+          transform: `translate(-50%, -50%)`
+        }}
+      />
       <span style={{
         position: `absolute`,
         top: `${tabHeight/2}px`,
@@ -261,6 +310,8 @@ const tabFontColor = `#792bef`; // #7e7aff
 
 function ToolbarIndicator(
   {
+    selectedPos,
+
     top,
     toolbarWidth,
 
@@ -268,11 +319,11 @@ function ToolbarIndicator(
     indicatorHeight,
 
     labels,
-    selectedPos,
 
     color
   }
 ){
+  // console.log("ToolbarIndicator_selectedPos: " + selectedPos);
   const left = (selectedPos*(indicatorWidth));
   return(
     <div className="tab-indicator" style={{
@@ -281,7 +332,7 @@ function ToolbarIndicator(
       width: `${indicatorWidth}px`,
       top: `${top}px`,
       left: `${left}px`,
-      backgroundColor: `cyan`,
+      backgroundColor: `#5fbcd3`,
       boxShadow: `${0} ${0}px ${20}px ${-4}px #000000`,
       zIndex: `4`
     }}>
@@ -307,7 +358,8 @@ function BrandArea(
 }
 
 function ContentArea(
-  { screenWidth, 
+  { 
+    screenWidth, 
     screenHeight, 
     
     contentAreaTransY,
@@ -316,8 +368,11 @@ function ContentArea(
     contentAreaHeight, 
     contentAreaMinCorners, 
     contentAreaMaxCorners,
+    currentSizeMargin,
 
-    currentSizeMargin }
+    currentTab,
+    tabColors
+  }
 ) {
 
   var currentCornerSize = ((contentAreaTransY * (contentAreaMaxCorners - contentAreaMinCorners)) / (contentAreaMaxTransY - 0)) + contentAreaMinCorners;
@@ -328,7 +383,9 @@ function ContentArea(
         borderTopLeftRadius: `${currentCornerSize}px`,
         borderTopRightRadius: `${currentCornerSize}px`,
         left: `${currentSizeMargin}px`,
-        right: `${currentSizeMargin}px`
+        right: `${currentSizeMargin}px`,
+
+        backgroundColor: `${tabColors[currentTab]}`
       }
     }>
     </div>
@@ -339,12 +396,6 @@ function ContentArea(
 export default Worksite;
 
 
-// const elementsPos = [
-//   (0*divSize)+(divSize/2),
-//   (1*divSize)+(divSize/2),
-//   (2*divSize)+(divSize/2),
-//   (3*divSize)+(divSize/2)
-// ];
 // // console.log("divSize: " + divSize + "    elementsPos: " + elementsPos);
 // const tabFontSize = `24px`;
 // const tabFontColor = `#792bef`; // #7e7aff
