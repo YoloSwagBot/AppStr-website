@@ -2,14 +2,26 @@ import './App.css';
 
 import React, { useState, useEffect, useRef } from 'react';
 
-import logo from './images/ic_appstr_brand_logo.svg'; 
-import icInfo from './images/ic_info.svg';
+import logo from './images/ic_appstr_brand_logo.svg';
 import icApps from './images/ic_apps.svg';
 import icWhereTo from './images/ic_whereto.svg';
 import icOther from './images/ic_other.svg';
 import error_horse from './images/error_horse.png';
- 
 
+import appGeoAlarm from './images/apps/ic_app_geoalarm.svg';
+import appTimeControl from './images/apps/ic_app_timecontrol.svg';
+import appDevOpts from './images/apps/ic_app_devopts.png';
+import appFTP from './images/apps/ic_app_ftp.png';
+
+
+// 000080 : dark_blue
+// 2a7fff : light_blue
+// 5fbcd3 : cyanish
+// 5fd3bc : tealish
+// ffdd55 : yellow
+// ff9955 : orange
+// ff80b2 : pink
+// fc3c3c : red
 
 
 function Worksite() {
@@ -81,20 +93,14 @@ function Worksite() {
 
   var currentSizeMargin = ((contentAreaTransY * (contentAreaMaxSideMargin - contentAreaMinSideMargin)) / (contentAreaMaxTransY - 0)) + contentAreaMinSideMargin;
   
+  const contentAreaWidth = screenWidth - (currentSizeMargin*2)
+
   const [selectedPos, setSelectedPos] = useState(0);
-  const tabs = ["About", "Apps", "WhereTo", "Other"];
+  const tabs = ["Apps", "WhereTo", "Other"];
   const toolbarWidth = (screenWidth-(currentSizeMargin*2)-brandIconSize)/2;
 
-// 000080 : dark_blue
-// 2a7fff : light_blue
-// 5fbcd3 : cyanish
-// 5fd3bc : tealish
-// ffdd55 : yellow
-// ff9955 : orange
-// ff80b2 : pink
-// fc3c3c : red
 
-  const tabColors = ['lightsalmon', '#2a7fff', '#5fd3bc', '#ff9955'];
+  const tabColors = ['#2a7fff', '#5fd3bc', 'lightsalmon'];
 
   return (
       <div className="main-container">
@@ -121,12 +127,10 @@ function Worksite() {
           onSelectPos={setSelectedPos} />
         <BrandArea/>
         <ContentArea
-          screenWidth={screenWidth}
-          screenHeight={screenHeight}
 
           contentAreaTransY={contentAreaTransY}
           contentAreaMaxTransY={contentAreaMaxTransY}
-
+          contentAreaWidth={contentAreaWidth}
           contentAreaHeight={contentAreaHeight}
           contentAreaMinCorners={contentAreaMinCorners} 
           contentAreaMaxCorners={contentAreaMaxCorners}
@@ -151,9 +155,8 @@ function SuperBackground(
           opacity: `${contentAreaTransY / contentAreaMaxTransY}`,
           transform: `translate(-50%, -50%)`,
           position: `absolute`,
-          top: `50%`,
+          top: `40%`,
           left: `40%`,
-          marginTop: `50px`,
           scale: `50%`
         }}/>
     </div>
@@ -209,7 +212,6 @@ function ToolbarArea(
   const tabWidth = toolbarWidth/numTabs;
   const tabHeight = toolbarHeight-16;
   const icons = [
-    icInfo,
     icApps,
     icWhereTo,
     icOther
@@ -332,7 +334,7 @@ function ToolbarIndicator(
       width: `${indicatorWidth}px`,
       top: `${top}px`,
       left: `${left}px`,
-      backgroundColor: `#5fbcd3`,
+      backgroundColor: `#ff80b2`,
       boxShadow: `${0} ${0}px ${20}px ${-4}px #000000`,
       zIndex: `4`
     }}>
@@ -359,13 +361,13 @@ function BrandArea(
 
 function ContentArea(
   { 
-    screenWidth, 
-    screenHeight, 
     
     contentAreaTransY,
     contentAreaMaxTransY,
 
+    contentAreaWidth,
     contentAreaHeight, 
+
     contentAreaMinCorners, 
     contentAreaMaxCorners,
     currentSizeMargin,
@@ -382,66 +384,142 @@ function ContentArea(
         transform: `translateY(${contentAreaTransY}px)`,
         borderTopLeftRadius: `${currentCornerSize}px`,
         borderTopRightRadius: `${currentCornerSize}px`,
+        
         left: `${currentSizeMargin}px`,
-        right: `${currentSizeMargin}px`,
+        width: `${contentAreaWidth}px`,
+
+        justifyContent: 'center',
 
         backgroundColor: `${tabColors[currentTab]}`
       }
     }>
+      { (() => {
+        switch(currentTab){
+          // default:
+          //   return <About />
+          default:
+            return <Apps />
+          case 1:
+            return <WhereTo />
+          case 2:
+            return <Other />
+        }
+      })()}
+    </div>
+  );
+}
+
+function Apps(
+  {
+
+  }
+){
+  const itemSize = 160;
+  const iconSize = 80;
+  const marginLeftRight = 32;
+  return (
+    <div style={{
+        position: `absolute`,
+        marginTop: '16px',
+        height: '100%',
+        left: `${marginLeftRight}px`,
+        right: `${marginLeftRight}px`,
+    }}>
+      <span style={{
+        color: "white", fontSize: '30px', fontWeight: '1000' 
+      }}>Google Play Store:</span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridAutoFlow: 'row' }}>
+        <App itemSize={itemSize} appIcon={appGeoAlarm} appIconSize={iconSize} appNameText={"GeoAlarm"} 
+          appLinkURL={"https://play.google.com/store/apps/details?id=com.appstr.geoalarm.prod"}/>
+        <App itemSize={itemSize} appIcon={appTimeControl} appIconSize={iconSize} appNameText={"Time Control"}
+          appLinkURL={"https://play.google.com/store/apps/details?id=com.appstr.timecontrol"}/>
+        <App itemSize={itemSize} appIcon={appDevOpts} appIconSize={iconSize} appNameText={"Developer Options"}
+          appLinkURL={"https://play.google.com/store/apps/details?id=com.appstr.devopts"}/>
+        <App itemSize={itemSize} appIcon={appFTP} appIconSize={iconSize} appNameText={"FTP"}
+          appLinkURL="https://play.google.com/store/apps/details?id=com.appstr.ftp"/>
+      </div>
+    </div>
+  );
+}
+
+function App(
+  {
+    itemSize,
+
+    appIcon,
+    appIconSize,
+    appNameText,
+    appLinkURL
+  }
+){
+  const openInNewTab = (url) => {
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+    if (newWindow) newWindow.opener = null
+  }
+  return(
+    <div style={{
+      width: `${itemSize}px`,
+      height: `${itemSize}px`,
+      margin: `32px`,
+      display: 'flex',
+      justifyContent: 'center'
+    }} onClick={() => openInNewTab(appLinkURL)} >
+      <img src={appIcon}
+        style={{
+          position: `absolute`,
+          width: `${appIconSize}px`,
+          height: `${appIconSize}px`,
+          objectFit: "cover",
+          borderRadius: '16px',
+          backgroundColor: "white"
+        }}/>
+        <span style={{ color: 'white', marginTop: `${appIconSize}px` }}>{appNameText}</span>
+    </div>
+  )
+}
+
+function WhereTo(
+  {
+
+  }
+){
+  return (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex', 
+      flexDirection: 'column',
+      justifyContent: 'center',
+      textAlign: 'center'
+    }}>
+      <span style={{ color: "white", fontSize: '30px', fontWeight: '1000' }}>Work in progress.</span>
+      <span style={{ color: "white", fontSize: '30px', fontWeight: '1000' }}>(GraphQL/PostgreSQL features, coming soon!)</span>
+    </div>
+  );
+}
+
+function Other(
+  {
+
+  }
+){
+  const marginLeftRight = 32;
+  return (
+    <div style={
+      {
+        position: `absolute`,
+        marginTop: '16px',
+        height: '100%',
+        left: `${marginLeftRight}px`,
+        right: `${marginLeftRight}px`,
+      }
+    }>
+      
+      <a href="https://www.linkedin.com/in/i-make-the-app-rull-gud/">LinkedIn</a>
+      <a href="https://github.com/yoloswagbot">GitHub</a>
     </div>
   );
 }
 
  
 export default Worksite;
-
-
-// // console.log("divSize: " + divSize + "    elementsPos: " + elementsPos);
-// const tabFontSize = `24px`;
-// const tabFontColor = `#792bef`; // #7e7aff
-// const elements = [
-//   <div style={{
-//     position: `absolute`,
-//     transform: `translate(-50%, -50%)`,
-//     top: `${(toolbarHeight/2)}px`,
-//     left: `${elementsPos[0]}px`,
-//     fontSize: tabFontSize,
-//     fontWeight: `bold`,
-//     color: tabFontColor
-//   }}>
-//     {labels[0]}
-//   </div>,
-//   <div style={{
-//     position: `absolute`,
-//     transform: `translate(-50%, -50%)`,
-//     top: `${(toolbarHeight/2)}px`,
-//     left: `${elementsPos[1]}px`,
-//     fontSize: tabFontSize,
-//     fontWeight: `bold`,
-//     color: tabFontColor
-//   }}>
-//     {labels[1]}
-//   </div>,
-//   <div style={{
-//     position: `absolute`,
-//     transform: `translate(-50%, -50%)`,
-//     top: `${(toolbarHeight/2)}px`,
-//     left: `${elementsPos[2]}px`,
-//     fontSize: tabFontSize,
-//     fontWeight: `bold`,
-//     color: tabFontColor
-//   }}>
-//     {labels[2]}
-//   </div>,
-//   <div style={{
-//     position: `absolute`,
-//     transform: `translate(-50%, -50%)`,
-//     top: `${(toolbarHeight/2)}px`,
-//     left: `${elementsPos[3]}px`,
-//     fontSize: tabFontSize,
-//     fontWeight: `bold`,
-//     color: tabFontColor
-//   }}>
-//     {labels[3]}
-//   </div>
-// ];
