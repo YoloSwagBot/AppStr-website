@@ -535,6 +535,9 @@ function Other(
       <div>
         <span style={{ fontWeight: '1000', color: 'blue' }} onClick={() => openInNewTab("https://github.com/yoloswagbot")} >GitHub</span>
       </div>
+      <div style={{ margin: '64px' }} >
+        <span style={{ fontWeight: '1000', color: 'blue' }} onClick={() => openInNewTab("https://play.google.com/store/apps/developer?id=AppStr")} >Google Play Store</span>
+      </div>
     </div>
   );
 }
