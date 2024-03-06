@@ -503,6 +503,12 @@ function Other(
 
   }
 ){
+  const openInNewTab = (url) => {
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+    if (newWindow) newWindow.opener = null
+  }
+
+  const lastUpdatedText = "March 2024"
   const marginLeftRight = 32;
   return (
     <div style={
@@ -512,11 +518,23 @@ function Other(
         height: '100%',
         left: `${marginLeftRight}px`,
         right: `${marginLeftRight}px`,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        textAlign: 'center'
       }
     }>
-      
-      <a href="https://www.linkedin.com/in/i-make-the-app-rull-gud/">LinkedIn</a>
-      <a href="https://github.com/yoloswagbot">GitHub</a>
+      <span style={{
+          color: "white",
+          fontWeight: '1000' 
+        }}
+        margin='64px'>Last Updated:    {lastUpdatedText}</span>
+      <div style={{ margin: '64px' }} onClick={() => openInNewTab("https://www.linkedin.com/in/i-make-the-app-rull-gud")} >
+        <span style={{ fontWeight: '1000', color: 'blue' }} >LinkedIn</span>
+        </div>
+      <div>
+        <span style={{ fontWeight: '1000', color: 'blue' }} onClick={() => openInNewTab("https://github.com/yoloswagbot")} >GitHub</span>
+      </div>
     </div>
   );
 }
