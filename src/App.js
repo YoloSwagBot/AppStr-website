@@ -27,58 +27,32 @@ import appFTP from './images/apps/ic_app_ftp.png';
 function Worksite() {
   const [screenWidth, setWidth] = useState(window.innerWidth);
   const [screenHeight, setHeight] = useState(window.innerHeight);
-  // console.log("initial_dimensions: " + screenWidth + ", " + screenHeight);
-  const isMobileWidth = screenWidth < 501;
-  const isSmallScreen = !isMobileWidth && screenWidth < 1025;
-  // const isLargerScreen = !isMobileWidth && !isSmallScreen;
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     // console.log("ON_RESIZE_EVENT: w: " + window.innerWidth + "    h: " + window.innerHeight);
-  //     setWidth(window.innerWidth);
-  //     setHeight(window.innerHeight);
-  //     // console.log("ON_RESIZE_EVENT: screenWidth: " + screenWidth + "    screenHeight: " + screenHeight);
-  //   };
-  //   window.addEventListener('resize', handleResize);
-  //   return () => window.removeEventListener('resize', handleResize);
-  // }, []);
+  
+  const screenRatio = Math.min(1, (screenWidth - 500) / (1024-500));
+  // console.log("screenRatio: " + screenRatio);
+
+  const handleResize = () => {
+    // console.log("ON_RESIZE_EVENT: w: " + window.innerWidth + "    h: " + window.innerHeight);
+    setWidth(window.innerWidth);
+    setHeight(window.innerHeight);
+    // console.log("ON_RESIZE_EVENT: screenWidth: " + screenWidth + "    screenHeight: " + screenHeight);
+  };
+  window.addEventListener('resize', handleResize);
+
+  // value = Math.round(min + (diff * ratio))
+  var tickerHeight = Math.round(16 + ((20-16) * screenRatio));
+  var toolbarHeight = Math.round(64 + ((80-64) * screenRatio));
+  var brandIconSize = Math.round(24 + ((32-24) * screenRatio));
+  var tabIndicatorHeight = Math.round(16 + ((32-16) * screenRatio));
+  var contentAreaMinCorners = Math.round(16 + ((20-16) * screenRatio));
+  var contentAreaCorners = Math.round(8 + ((16-8) * screenRatio));
+  var contentAreaMinSideMargin = Math.round(16 + ((56-16) * screenRatio));
+  var contentAreaMaxSideMargin = Math.round(32 + ((98-32) * screenRatio));
 
 
-  var tickerHeight = 16;
-  var toolbarHeight = 64;
-  var brandIconSize = 24
-  var tabIndicatorHeight = 8;
-  var contentAreaMinCorners = 24;
-  var contentAreaMaxCorners = 48;
-  var contentAreaMinSideMargin = 32;
-  var contentAreaMaxSideMargin = 64;
-  if (isMobileWidth){
-    tickerHeight = 16;
-    toolbarHeight = 64;
-    brandIconSize = 24;
-    contentAreaMinCorners = 16;
-    contentAreaMaxCorners = 8;
-    contentAreaMinSideMargin = 16;
-    contentAreaMaxSideMargin = 32;
-  }else if(isSmallScreen){
-    tickerHeight = 20;
-    toolbarHeight = 80;
-    brandIconSize = 32;
-    contentAreaMinCorners = 32;
-    contentAreaMaxCorners = 16;
-    contentAreaMinSideMargin = 56;
-    contentAreaMaxSideMargin = 98;
-  }else{ // isLargerScreen
-    tickerHeight = 20;
-    toolbarHeight = 80;
-    brandIconSize = 32;
-    contentAreaMinCorners = 32;
-    contentAreaMaxCorners = 16;
-    contentAreaMinSideMargin = 56;
-    contentAreaMaxSideMargin = 98;
-  }
   const contentAreaHeight = screenHeight - toolbarHeight - tickerHeight;
 
-  var contentAreaMaxTransY = contentAreaHeight - contentAreaMaxCorners;
+  var contentAreaMaxTransY = contentAreaHeight - contentAreaCorners;
   const [translationY, setTranslationY] = useState(0);
   var contentAreaTransY = translationY
   const onWheel = (event) => {
@@ -113,6 +87,7 @@ function Worksite() {
           contentAreaMaxTransY={contentAreaMaxTransY}
           contentAreaMinSideMargin={contentAreaMinSideMargin} />
         <ToolbarArea
+          screenRatio={screenRatio}
           top={tickerHeight}
           left={currentSizeMargin+(toolbarWidth)}
           right={(currentSizeMargin)}
@@ -132,8 +107,9 @@ function Worksite() {
           contentAreaMaxTransY={contentAreaMaxTransY}
           contentAreaWidth={contentAreaWidth}
           contentAreaHeight={contentAreaHeight}
-          contentAreaMinCorners={contentAreaMinCorners} 
-          contentAreaMaxCorners={contentAreaMaxCorners}
+
+          contentAreaCorners={contentAreaCorners}
+
           currentSizeMargin={currentSizeMargin}
           
           currentTab={selectedPos}
@@ -190,6 +166,8 @@ function ToolsTicker(
 
 function ToolbarArea(
   {
+    screenRatio,
+
     top,
 
     toolbarHeight,
@@ -203,6 +181,7 @@ function ToolbarArea(
     left,
     right,
 
+    tickerHeight,
     tabIndicatorHeight,
 
     opacity
@@ -218,6 +197,7 @@ function ToolbarArea(
   ]
   const tabs = labels.map((label, pos) => (
     <ToolbarTab
+      screenRatio={screenRatio}
       key={pos}
       pos={pos}
       tabHeight={tabHeight}
@@ -243,7 +223,7 @@ function ToolbarArea(
       {tabs}
       <ToolbarIndicator
         selectedPos={selectedPos}
-        top={toolbarHeight-16}
+        top={(tickerHeight+toolbarHeight-tabIndicatorHeight)}
         toolbarWidth={toolbarWidth}
         indicatorWidth={tabWidth}
         indicatorHeight={tabIndicatorHeight}
@@ -254,6 +234,8 @@ function ToolbarArea(
 
 function ToolbarTab(
   {
+    screenRatio,
+
     pos,
 
     tabHeight,
@@ -272,7 +254,7 @@ function ToolbarTab(
     setSelectedPos(pos);
   }
 
-  const tabFontSize = `20px`;
+  const tabFontSize = `${10 + ((20-10) * screenRatio)}px`;
   const tabFontColor = `#000`; // #7e7aff
   return(
     <div className="toolbar-tab"
@@ -368,8 +350,8 @@ function ContentArea(
     contentAreaWidth,
     contentAreaHeight, 
 
-    contentAreaMinCorners, 
-    contentAreaMaxCorners,
+    contentAreaCorners, 
+    
     currentSizeMargin,
 
     currentTab,
@@ -377,13 +359,12 @@ function ContentArea(
   }
 ) {
 
-  var currentCornerSize = ((contentAreaTransY * (contentAreaMaxCorners - contentAreaMinCorners)) / (contentAreaMaxTransY - 0)) + contentAreaMinCorners;
   return (
     <div className="content-area" style={
       {
         transform: `translateY(${contentAreaTransY}px)`,
-        borderTopLeftRadius: `${currentCornerSize}px`,
-        borderTopRightRadius: `${currentCornerSize}px`,
+        borderTopLeftRadius: `${contentAreaCorners}px`,
+        borderTopRightRadius: `${contentAreaCorners}px`,
         
         left: `${currentSizeMargin}px`,
         width: `${contentAreaWidth}px`,
@@ -398,7 +379,7 @@ function ContentArea(
           // default:
           //   return <About />
           default:
-            return <Apps />
+            return <Apps appsAreaWidth={contentAreaWidth-(2*contentAreaCorners)} />
           case 1:
             return <WhereTo />
           case 2:
@@ -411,12 +392,16 @@ function ContentArea(
 
 function Apps(
   {
-
+    appsAreaWidth
   }
 ){
   const itemSize = 160;
   const iconSize = 80;
   const marginLeftRight = 32;
+  const numRowItems = Math.floor((appsAreaWidth - (marginLeftRight*2)) / (itemSize*1.20));
+  
+  console.log("numItems: " + numRowItems + " -- appsWidth: " + appsAreaWidth + " -- mLR*2: " + (marginLeftRight*2) + " -- itemSize: " + (itemSize*1.1));
+
   return (
     <div style={{
         position: `absolute`,
@@ -428,7 +413,7 @@ function Apps(
       <span style={{
         color: "white", fontSize: '30px', fontWeight: '1000' 
       }}>Google Play Store:</span>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridAutoFlow: 'row' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${numRowItems}, 1fr)` }}>
         <App itemSize={itemSize} appIcon={appGeoAlarm} appIconSize={iconSize} appNameText={"GeoAlarm"} 
           appLinkURL={"https://play.google.com/store/apps/details?id=com.appstr.geoalarm.prod"}/>
         <App itemSize={itemSize} appIcon={appTimeControl} appIconSize={iconSize} appNameText={"Time Control"}

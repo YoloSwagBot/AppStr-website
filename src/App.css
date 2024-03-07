@@ -86,8 +86,6 @@ html {
   position: absolute;
   bottom: 0px;
   height: var(--content-area-height);
-  left: 10px;
-  right: 10px;
   box-shadow: 0 0px 20px -4px black;
   z-index: 5;
 }
