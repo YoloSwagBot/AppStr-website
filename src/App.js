@@ -1,6 +1,7 @@
-import './App.css';
+
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useDrag } from 'react-use-gesture';
 
 import logo from './images/ic_appstr_brand_logo.svg';
 import icApps from './images/ic_apps.svg';
@@ -24,7 +25,7 @@ import appFTP from './images/apps/ic_app_ftp.png';
 // fc3c3c : red
 
 
-function Worksite() {
+function Webpage() {
   const [screenWidth, setWidth] = useState(window.innerWidth);
   const [screenHeight, setHeight] = useState(window.innerHeight);
   
@@ -77,7 +78,10 @@ function Worksite() {
   const tabColors = ['#2a7fff', '#5fd3bc', 'lightsalmon'];
 
   return (
-      <div className="main-container">
+      <div className="main-container" style={{
+        height: `${100}vh`,
+        width: `${100}vw`
+      }}>
         <SuperBackground
           contentAreaTransY={contentAreaTransY}
           contentAreaMaxTransY={contentAreaMaxTransY} />
@@ -100,7 +104,7 @@ function Worksite() {
 
           selectedPos={selectedPos} 
           onSelectPos={setSelectedPos} />
-        <BrandArea/>
+        <BrandArea screenRatio={screenRatio}/>
         <ContentArea
 
           contentAreaTransY={contentAreaTransY}
@@ -125,15 +129,22 @@ function SuperBackground(
   }
 ) {
   return (
-    <div className="super-background" style={{ backgroundColor: 'whitesmoke' }}>
+    <div className="super-background" style={{ 
+      height: `${100}vh`,
+      width: `${100}vw`,
+      zIndex: `${0}`,
+      backgroundColor: 'whitesmoke',
+      justifyContent: `center`,
+      alignItems: `center`,
+      display: `flex`
+    }}>
       <img id="error-horse" src={error_horse}
         style={{
-          opacity: `${contentAreaTransY / contentAreaMaxTransY}`,
-          transform: `translate(-50%, -50%)`,
           position: `absolute`,
-          top: `40%`,
-          left: `40%`,
-          scale: `50%`
+          scale: `50%`,
+
+          opacity: `${contentAreaTransY / contentAreaMaxTransY}`,
+          bottom: `64px`,
         }}/>
     </div>
   );
@@ -150,14 +161,36 @@ function ToolsTicker(
   // console.log("toolsTickerTransY: " + toolsTickerTransY);
 
   const toolsUsedText = "React(JSX), Google Cloud Platform(GCP), Helm, Kubernetes, Docker, Nginx, GraphQL(coming soon), PostgreSQL(coming soon), Kotlin/Compose/etc on Android, and more...";
+  
+  const scrollbarStyle = {
+    '&::-webkit-scrollbar': {
+      width: '0px',
+      background: 'transparent',
+    },
+  };
+  
   return (
     <div className="tools-ticker"
       style={{
+        position: `absolute`,
+        top: `${0}px`,
+        height: `${20}px`,
+        zIndex: `5`,
+        backgroundColor: `#d9ff7a`,
+        boxShadow: `${0} ${0}px ${10}px ${-4}px black`,
+        borderBottomLeftRadius: `${8}px`,
+        borderBottomRightRadius: `${8}px`,
+
         transform: `translateY(${toolsTickerTransY}px)`,
         left: `${contentAreaMinSideMargin}px`,
         right: `${contentAreaMinSideMargin}px`
       }}>
-        <div className="tools-ticker-text">
+        <div className="tools-ticker-text" style={{
+          marginLeft: `${16}px`,
+          whiteSpace: `nowrap`,
+          textOverflow: `clip`,
+          overflow: `scroll`,
+        }}>
             {toolsUsedText}
         </div>
     </div>
@@ -327,13 +360,36 @@ function ToolbarIndicator(
 
 function BrandArea(
   {
+    screenRatio,
+
     contentAreaTransY,
     contentAreaMaxTransY,
   }
 ) {
+  const brandAreaTopMargin = 10 + ((20-10)*screenRatio);
+  const buttonRightMargin = 4 + ((32-4)*screenRatio);
   return (
-    <div className="brand-area">
-      <button className="brand-button">
+    <div className="brand-area" style={{
+
+      position: `absolute`,
+      top: `${brandAreaTopMargin}px`,
+      right: `${0}px`,
+      height: `${80}px`,
+      marginLeft: `auto`,
+      display: `flex`,
+      alignItems: `center`,
+      backgroundColor: `transparent`
+    }}>
+      <button className="brand-button" style={{
+        marginRight: `${buttonRightMargin}px`,
+        width: `${48}px`,
+        height: `${48}px`,
+        border: `#FFFFFF10`,
+        background: `white`,
+        borderRadius: `100%`,
+        cursor: `pointer`,    
+        boxShadow: `${0} ${2}px ${6}px rgba(0, 0, 0, 0.25)`
+      }}>
         <img className="brand-icon" src={logo}  alt="Logo" width="32" height="32"  viewBox="0 0 100 100"/>
 
       </button>
@@ -348,7 +404,7 @@ function ContentArea(
     contentAreaMaxTransY,
 
     contentAreaWidth,
-    contentAreaHeight, 
+    contentAreaHeight,
 
     contentAreaCorners, 
     
@@ -362,6 +418,12 @@ function ContentArea(
   return (
     <div className="content-area" style={
       {
+        position: `absolute`,
+        bottom: `${0}px`,
+        height: `${contentAreaHeight}px`,
+        boxShadow: `${0} ${0}px ${20}px ${-4}px black`,
+        zIndex: `5`,
+
         transform: `translateY(${contentAreaTransY}px)`,
         borderTopLeftRadius: `${contentAreaCorners}px`,
         borderTopRightRadius: `${contentAreaCorners}px`,
@@ -400,7 +462,7 @@ function Apps(
   const marginLeftRight = 32;
   const numRowItems = Math.floor((appsAreaWidth - (marginLeftRight*2)) / (itemSize*1.20));
   
-  console.log("numItems: " + numRowItems + " -- appsWidth: " + appsAreaWidth + " -- mLR*2: " + (marginLeftRight*2) + " -- itemSize: " + (itemSize*1.1));
+  // console.log("numItems: " + numRowItems + " -- appsWidth: " + appsAreaWidth + " -- mLR*2: " + (marginLeftRight*2) + " -- itemSize: " + (itemSize*1.1));
 
   return (
     <div style={{
@@ -527,5 +589,5 @@ function Other(
   );
 }
 
- 
-export default Worksite;
+export default Webpage;
+
