@@ -1,7 +1,6 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useDrag } from 'react-use-gesture';
 
 import logo from './images/ic_appstr_brand_logo.svg';
 import icApps from './images/ic_apps.svg';
